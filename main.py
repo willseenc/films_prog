@@ -9,9 +9,9 @@ response = requests.get(
         "X-API-KEY": API_KEY
     }
 ).json()
-films = []
-for film_hash in response["films"]:
-    film = Film(film_hash)
-    films.append(film)
-for film in films:
-    print(f"{film}\n")
+pagesCount = int(response['pagesCount']) + 1
+films = Film.get_all_films_from_site(pagesCount,URL_API,API_KEY)
+
+genres_films = Film.filter_with_user_genre('драма', films)
+for film in genres_films:
+    print(film, '\n')
