@@ -6,7 +6,7 @@ import re
 
 
 DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH = f'{DIR}/data/data.json'
+JSON_PATH_REVIEWED = f'{DIR}/data/data_reviewed.json'
 JSON_PATH_USERS = f'{DIR}/data/data_users.json'
 
 
@@ -72,25 +72,6 @@ def check_correct_nickname(function):
 @check_correct_nickname
 def creating_new_username(nickname):
     return nickname
-
-
-def check_correct_info(function):
-    def wrapper(info):
-        info = str(info)
-        if info.startswith('@'):
-            if is_user_in_json(JSON_PATH, info):
-                return function(info)
-            else:
-                raise WrongUser('Такого пользователя не существует!')
-        if not info.startswith('@') and not info.startswith('#'):
-            raise WrongInfo('Поиск должен начинаться с "@" или "#"!')
-        return function(info)
-    return wrapper
-
-
-@check_correct_info
-def creating_new_search_info(info):
-    return info
 
 
 def is_user_in_json(JSON_PATH, username):

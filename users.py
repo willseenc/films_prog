@@ -7,7 +7,7 @@ from jsonworker import read_json_file, write_json_file, append_new_data_to_file,
 
 
 DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH = f'{DIR}/data/data.json'
+JSON_PATH_REVIEWED = f'{DIR}/data/data_reviewed.json'
 JSON_PATH_USERS = f'{DIR}/data/data_users.json'
 
 
