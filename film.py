@@ -47,6 +47,7 @@ class Film:
         for film in films:
             yield film    
     
+    @staticmethod
     def films_print(films, body_function):
         if len(films) > 5:
             films_for_user = Film.films_iter(films)
