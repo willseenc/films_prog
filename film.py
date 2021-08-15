@@ -52,8 +52,7 @@ class Film:
         if len(films) > 5:
             films_for_user = Film.films_iter(films)
             print('\nФильмы:\n')
-            body_function(check_iter(films_for_user))
-            body_function(check_iter(films_for_user))
+            check_iter(body_function,films_for_user)
             page = 0
             page_for_user = 1
             print(f'\n{page_for_user} страница')
@@ -63,8 +62,7 @@ class Film:
                     page += 1
                     page_for_user += 1
                     print('\n')
-                    body_function(check_iter(films_for_user))
-                    body_function(check_iter(films_for_user))
+                    check_iter(body_function,films_for_user)
                     print(f'\n\n{page_for_user} страница')
                 elif user_choice == '2':
                     print('\n')
@@ -74,10 +72,9 @@ class Film:
                         page_for_user = 1
                         page = 0
                     films_for_user = Film.films_iter(films)
-                    for i in range(page*2):
-                        check_iter(films_for_user)
-                    body_function(check_iter(films_for_user))
-                    body_function(check_iter(films_for_user))
+                    for i in range(page):
+                        check_iter('',films_for_user)
+                    check_iter(body_function,films_for_user)
                     print(f'\n\n{page_for_user} страница')
                 else:
                     break

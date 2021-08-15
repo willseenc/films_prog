@@ -1,10 +1,20 @@
-def check_iter(iterator):
-    try:
-        film = next(iterator)
-    except StopIteration:
-        raise NoFilms('Фильмы закончились')
+def check_iter(body_function, iterator):
+    if body_function == '':
+        try:
+            film = next(iterator)
+            film = next(iterator)
+            film = next(iterator)
+            film = next(iterator)
+        except StopIteration:
+            raise NoFilms('Фильмы закончились')
     else:
-        return film
+        try:
+            film = body_function(next(iterator))
+            film = body_function(next(iterator))
+            film = body_function(next(iterator))
+            film = body_function(next(iterator))
+        except StopIteration:
+            raise NoFilms('Фильмы закончились')
 
 def check_int(number):
     try:
