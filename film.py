@@ -1,11 +1,37 @@
 import requests
-from exceptions import check_iter
+from exceptions import check_correct_page, check_int
+import math
 
+
+class PageDisplay():
+    def __init__(self, films, body_function, films_number):
+        self.films = films
+        self.pages_amount = math.ceil(len(films)/5)
+        self.page = 0
+        self.iter_films = iter(films)
+        self.body_function = body_function
+        self.films_number = int(films_number)
+
+    def previous(self):
+        self.iter_films = iter(self.films)
+        self.page -= 1
+        self.page = check_correct_page(self.page)
+        for i in range(int((self.page-1)*self.films_number)):
+            next(self.iter_films)
+        for i in range(self.films_number):
+            self.body_function(next(self.iter_films))
+        self.body_function(f'\n\n{self.page} страница из {self.pages_amount}')
+
+    def next(self):
+        self.page += 1
+        for i in range(self.films_number):
+            self.body_function(next(self.iter_films))
+        self.body_function(f'\n\n{self.page} страница из {self.pages_amount}')
 
 class Film:
     @staticmethod
     def get_all_films_from_site(pagesCount, URL_API, API_KEY):
-        films = []
+        films = [] 
         for page in range(1, pagesCount):
             response = requests.get(
             URL_API,
@@ -41,41 +67,19 @@ class Film:
     def sort_by_date(films):
         films.sort(key=date_key)
         return films
-
-    @staticmethod
-    def films_iter(films):
-        for film in films:
-            yield film    
     
     @staticmethod
     def films_print(films, body_function):
         if len(films) > 5:
-            films_for_user = Film.films_iter(films)
-            print('\nФильмы:\n')
-            check_iter(body_function,films_for_user)
-            page = 0
-            page_for_user = 1
-            print(f'\n{page_for_user} страница')
+            films_for_user = PageDisplay(films, body_function, check_int(input('Количество фильмов на странице:\n>')))
             while True:
                 user_choice = input('\nХотите посетить следующую/предыдущую страницу?[1/2]. Чтобы выйти - любой символ\n>')
                 if user_choice == '1':
-                    page += 1
-                    page_for_user += 1
-                    print('\n')
-                    check_iter(body_function,films_for_user)
-                    print(f'\n\n{page_for_user} страница')
+                    body_function('\n')
+                    films_for_user.next()
                 elif user_choice == '2':
-                    print('\n')
-                    page -= 1 
-                    page_for_user -= 1
-                    if page <= 0:
-                        page_for_user = 1
-                        page = 0
-                    films_for_user = Film.films_iter(films)
-                    for i in range(page):
-                        check_iter('',films_for_user)
-                    check_iter(body_function,films_for_user)
-                    print(f'\n\n{page_for_user} страница')
+                    body_function('\n')
+                    films_for_user.previous()
                 else:
                     break
         else:

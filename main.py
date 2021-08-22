@@ -1,6 +1,5 @@
-from exceptions import check_correct_rating, check_int
 from users import User
-from jsonworker import append_new_data_to_file, append_new_film_to_json, log_in, print_user_films
+from jsonworker import log_in
 import requests
 from film import Film
 import os
@@ -43,11 +42,17 @@ while user:
 10. Выход\n''')
     user_choice = input('Выберите цифрой:\n>')
     if user_choice == '1':
-        pass
+        Film.films_print(films, print)
     elif user_choice == '2':
-        pass
+        films_for_user = Film.filter_with_title(input('\nВведите название фильма:\n>').lower(), films)
+        print('\n')
+        Film.films_print(films_for_user, print)
+        time.sleep(4)
     elif user_choice == '3':
-        pass
+        films_for_user = Film.filter_with_user_genre(input('\nВведите интересующий жанр:\n>').lower(), films)
+        print('\n')
+        Film.films_print(films_for_user, print)
+        time.sleep(4)
     elif user_choice == '4':
         pass
     elif user_choice == '5':

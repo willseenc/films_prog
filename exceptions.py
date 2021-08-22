@@ -5,7 +5,11 @@ def check_int(number):
         raise NotInt('Нужно вводить только числа!')
     return int(number)
 
-
+def check_correct_page(page):
+    if int(page) <= 1:
+        page = 1
+    return page
+    
 class NoFilms(Exception):
     def __init__(self,text):
         self.txt = text

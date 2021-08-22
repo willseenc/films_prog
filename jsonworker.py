@@ -86,5 +86,3 @@ def is_user_in_json(JSON_PATH, username):
         elif username != hash['username']:
             continue
     return False
-
-
