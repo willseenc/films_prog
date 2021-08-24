@@ -1,12 +1,12 @@
 import requests
-from exceptions import check_correct_page, check_int
+from exceptions import NextNotExist, check_correct_page, check_int
 import math
 
 
 class PageDisplay():
     def __init__(self, films, body_function, films_number):
         self.films = films
-        self.pages_amount = math.ceil(len(films)/5)
+        self.pages_amount = math.ceil(len(films)/films_number)
         self.page = 0
         self.iter_films = iter(films)
         self.body_function = body_function
@@ -72,19 +72,10 @@ class Film:
     def films_print(films, body_function):
         if len(films) > 5:
             films_for_user = PageDisplay(films, body_function, check_int(input('Количество фильмов на странице:\n>')))
-            while True:
-                user_choice = input('\nХотите посетить следующую/предыдущую страницу?[1/2]. Чтобы выйти - любой символ\n>')
-                if user_choice == '1':
-                    body_function('\n')
-                    films_for_user.next()
-                elif user_choice == '2':
-                    body_function('\n')
-                    films_for_user.previous()
-                else:
-                    break
+            page_loop(body_function, films_for_user)
         else:
-            for film in films:
-                body_function(film, '\n')
+            for index, film in enumerate(films, start=1):
+                body_function(f'{index}. {film}\n')
 
     def __init__(self, film_hash):
         self.title = film_hash["nameRu"]
@@ -98,4 +89,18 @@ class Film:
 
 def date_key(film):
     return film.year
-    
+
+def page_loop(body_function, films_for_user):
+    while True:
+        user_choice = input('\nХотите посетить следующую/предыдущую страницу?[1/2]. Чтобы выйти - любой символ\n>')
+        if user_choice == '1':
+            body_function('\nФильмы:\n')
+            try:
+                films_for_user.next()
+            except StopIteration:
+                raise NextNotExist('Фильмы закончились!')
+        elif user_choice == '2':
+            body_function('\nФильмы:\n')
+            films_for_user.previous()
+        else:
+            break

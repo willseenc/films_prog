@@ -48,3 +48,8 @@ class WrongInfo(Exception):
 class WrongUser(Exception):
     def __init__(self,text):
         self.txt = text
+
+
+class NextNotExist(Exception):
+    def __init__(self,text):
+        self.txt = text

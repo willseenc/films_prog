@@ -1,9 +1,10 @@
 from users import User
-from jsonworker import log_in
+from jsonworker import get_films_from_profile, log_in, append_film_to_user_profile_in_json, read_json_file
 import requests
 from film import Film
 import os
 import time
+from exceptions import check_int
 
 
 DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,6 +27,13 @@ pagesCount = int(response['pagesCount']) + 1
 films = Film.get_all_films_from_site(pagesCount,URL_API,API_KEY)
 
 
+def add_film_to_profile(JSON_PATH, is_rating):
+    films_for_user = Film.filter_with_title(input('\nВведите название фильма:\n>').lower(), films)
+    Film.films_print(films_for_user, print)
+    film_choice = check_int(input('Выберите числом:\n>')) - 1
+    append_film_to_user_profile_in_json(JSON_PATH, user.username, films_for_user[film_choice], is_rating)
+
+
 user = log_in(User)
 while user:
     print('''\nПриветствуем Вас в поиске фильмов!
@@ -43,6 +51,7 @@ while user:
     user_choice = input('Выберите цифрой:\n>')
     if user_choice == '1':
         Film.films_print(films, print)
+        time.sleep(4)
     elif user_choice == '2':
         films_for_user = Film.filter_with_title(input('\nВведите название фильма:\n>').lower(), films)
         print('\n')
@@ -54,17 +63,26 @@ while user:
         Film.films_print(films_for_user, print)
         time.sleep(4)
     elif user_choice == '4':
-        pass
+        add_film_to_profile(JSON_PATH_REVIEWED, False)
     elif user_choice == '5':
-        pass
+        add_film_to_profile(JSON_PATH_PLANNING, False)
     elif user_choice == '6':
-        pass
+        user_films = get_films_from_profile(user.username, JSON_PATH_REVIEWED, False, films)
+        print('\n')
+        Film.films_print(user_films, print)
+        time.sleep(4)
     elif user_choice == '7':
-        pass
+        user_films = get_films_from_profile(user.username, JSON_PATH_PLANNING, False, films)
+        print('\n')
+        Film.films_print(user_films, print)
+        time.sleep(4)
     elif user_choice == '8':
-        pass
+        add_film_to_profile(JSON_PATH_RATING, True)
     elif user_choice == '9':
-        pass
+        user_films = get_films_from_profile(user.username, JSON_PATH_RATING, True, films)
+        print('\n')
+        Film.films_print(user_films, print)
+        time.sleep(4)
     elif user_choice == '10':
         print('\nСпасибо за использование!\nДо скорых встреч!')
         break

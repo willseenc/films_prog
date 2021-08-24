@@ -3,6 +3,7 @@ from exceptions import FiguresInNickname, WrongInfo, WrongNickname, WrongUser, c
 import json
 import os
 import re
+from film import Film
 
 
 DIR = os.path.dirname(os.path.abspath(__file__))
@@ -25,12 +26,13 @@ def write_json_file(JSON_PATH, data):
         json.dump(data, json_file, ensure_ascii=False)
 
 
-def append_new_data_to_file(JSON_PATH, self_hash):
+def append_new_data_to_file(JSON_PATH, self_hash, old_hash, remove_index):
     if os.stat(JSON_PATH).st_size:
         data = read_json_file(JSON_PATH)
     else:
         data = []
-    
+    if remove_index != 0:
+        data.remove(old_hash)
     data.append(self_hash)
     write_json_file(JSON_PATH, data)
 
@@ -82,7 +84,67 @@ def is_user_in_json(JSON_PATH, username):
     data = read_json_file(JSON_PATH)
     for hash in data:
         if username  == hash['username']:
-            return True
+            return hash
         elif username != hash['username']:
             continue
-    return False
+    return 0
+
+
+def append_film_to_user_profile_in_json(JSON_PATH, username, film, rating):
+    user_hash = is_user_in_json(JSON_PATH, username)
+    if user_hash != 0:
+        if rating != False:
+            user_hash['films'].append({film.__str__() : check_int(input('Введите рейтинг:\n>'))})
+        else:
+            user_hash['films'].append(film.__str__())
+        append_new_data_to_file(JSON_PATH, user_hash, is_user_in_json(JSON_PATH, username), 1)
+    else:
+        if rating != False:
+            append_new_data_to_file(JSON_PATH, {'username' : username, 'films' : [{film.__str__() : check_int(input('Введите рейтинг:\n>'))}]}, 0, 0)
+        else:
+            append_new_data_to_file(JSON_PATH, {'username' : username, 'films' : [film.__str__()]}, 0, 0)
+
+
+def get_films_from_profile(username, JSON_PATH, is_rating, all_films):
+    user_films = []
+    profile_hashes = read_json_file(JSON_PATH)
+    for hash in profile_hashes:
+        if username == hash['username']:
+            films = hash['films']
+            if is_rating:
+               get_films_with_rating(films, user_films, input('1. От лучшего к худшему\n2. От худшего к лучшему\n>'), all_films)
+            else:
+                for films in films:
+                    user_films.append(films)
+    return user_films
+            
+
+def get_films_with_rating(films, user_films, user_choice, all_films):
+    if user_choice == '1':
+        films.sort(key=rating_key, reverse=True)
+        print(films)
+    else:
+        print('Фильмы будут выведены от худшего к лучшему!')
+        films.sort(key=rating_key)
+    user_choice = input('Хотите вывести фильмы определенного жанра?\n1. Да\n>')
+    if user_choice == '1':
+        genre = input('Жанр:\n>').lower()
+        films_for_user = []
+    for film_hash in films:
+        for user_film in film_hash:
+            for film in all_films:
+                if film.__str__() == user_film:
+                    if user_choice == '1':
+                        films_for_user.append(film)
+                        films_for_user = Film.filter_with_user_genre(genre, films_for_user)
+                    else:
+                        user_films.append(f'{film}\nВаша оценка: {film_hash[user_film]}')
+    if user_choice == '1':
+        for film in films_for_user:
+            user_films.append(f'{film}\nВаша оценка: {film_hash[user_film]}')
+    
+
+
+def rating_key(film_hashes):
+    for i in film_hashes.values():
+        return int(i)
