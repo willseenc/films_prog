@@ -1,9 +1,8 @@
 import os
-import json
 import random
 import string
 from exceptions import ShortPassword, LongPassword, check_int
-from jsonworker import read_json_file, write_json_file, append_new_data_to_file, all_users_from_json
+from jsonworker import append_new_data_to_file, all_users_from_json
 
 
 DIR = os.path.dirname(os.path.abspath(__file__))
@@ -57,4 +56,4 @@ class User:
         self.user_hash = user_hash
 
     def append_to_json_file(self):
-        return append_new_data_to_file(JSON_PATH_USERS, self.user_hash)
+        return append_new_data_to_file(JSON_PATH_USERS, self.user_hash, 0, 0)

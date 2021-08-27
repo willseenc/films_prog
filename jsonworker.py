@@ -1,9 +1,6 @@
-from math import inf, log, perm
-from exceptions import FiguresInNickname, WrongInfo, WrongNickname, WrongUser, check_int
+from exceptions import FiguresInNickname, WrongNickname, check_int, check_rating
 import json
 import os
-import re
-from film import Film
 
 
 DIR = os.path.dirname(os.path.abspath(__file__))
@@ -94,7 +91,7 @@ def append_film_to_user_profile_in_json(JSON_PATH, username, film, rating):
     user_hash = is_user_in_json(JSON_PATH, username)
     if user_hash != 0:
         if rating != False:
-            user_hash['films'].append({film.__str__() : check_int(input('Введите рейтинг:\n>'))})
+            user_hash['films'].append({film.__str__() : check_rating(check_int(input('Введите рейтинг:\n>')))})
         else:
             user_hash['films'].append(film.__str__())
         append_new_data_to_file(JSON_PATH, user_hash, is_user_in_json(JSON_PATH, username), 1)
@@ -105,46 +102,22 @@ def append_film_to_user_profile_in_json(JSON_PATH, username, film, rating):
             append_new_data_to_file(JSON_PATH, {'username' : username, 'films' : [film.__str__()]}, 0, 0)
 
 
-def get_films_from_profile(username, JSON_PATH, is_rating, all_films):
+def get_films_from_profile(username, JSON_PATH, is_rating, online_cinema):
     user_films = []
     profile_hashes = read_json_file(JSON_PATH)
     for hash in profile_hashes:
         if username == hash['username']:
             films = hash['films']
             if is_rating:
-               get_films_with_rating(films, user_films, input('1. От лучшего к худшему\n2. От худшего к лучшему\n>'), all_films)
+               online_cinema.get_films_with_rating(films, user_films, input('1. От лучшего к худшему\n2. От худшего к лучшему\n>'))
             else:
                 for films in films:
                     user_films.append(films)
     return user_films
             
 
-def get_films_with_rating(films, user_films, user_choice, all_films):
-    if user_choice == '1':
-        films.sort(key=rating_key, reverse=True)
-        print(films)
-    else:
-        print('Фильмы будут выведены от худшего к лучшему!')
-        films.sort(key=rating_key)
-    user_choice = input('Хотите вывести фильмы определенного жанра?\n1. Да\n>')
-    if user_choice == '1':
-        genre = input('Жанр:\n>').lower()
-        films_for_user = []
-    for film_hash in films:
-        for user_film in film_hash:
-            for film in all_films:
-                if film.__str__() == user_film:
-                    if user_choice == '1':
-                        films_for_user.append(film)
-                        films_for_user = Film.filter_with_user_genre(genre, films_for_user)
-                    else:
-                        user_films.append(f'{film}\nВаша оценка: {film_hash[user_film]}')
-    if user_choice == '1':
-        for film in films_for_user:
-            user_films.append(f'{film}\nВаша оценка: {film_hash[user_film]}')
-    
-
-
-def rating_key(film_hashes):
-    for i in film_hashes.values():
-        return int(i)
+def add_film_to_profile(JSON_PATH, is_rating, online_cinema, films, user):
+    films_for_user = online_cinema.filter_with_title(input('\nВведите название фильма:\n>').lower())
+    online_cinema.films_print(films_for_user, print)
+    film_choice = check_int(input('Выберите числом:\n>')) - 1
+    append_film_to_user_profile_in_json(JSON_PATH, user.username, films_for_user[film_choice], is_rating)
