@@ -3,15 +3,6 @@ import json
 import os
 
 
-DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH_PLANNING = f'{DIR}/data/data_planning.json'
-JSON_PATH_REVIEWED = f'{DIR}/data/data_reviewed.json'
-JSON_PATH_RATING = f'{DIR}/data/data_rating.json'
-JSON_PATH_USERS = f'{DIR}/data/data_users.json'
-URL_API = "https://kinopoiskapiunofficial.tech/api/v2.2/films/top"
-API_KEY = "e093635d-9fc6-47fb-8c4f-5b1d8b994f4b"
-
-
 def read_json_file(JSON_PATH):
     with open(JSON_PATH, 'r', encoding='utf-8') as read_file:
             data = json.load(read_file)
@@ -32,15 +23,6 @@ def append_new_data_to_file(JSON_PATH, self_hash, old_hash, remove_index):
         data.remove(old_hash)
     data.append(self_hash)
     write_json_file(JSON_PATH, data)
-
-
-def all_users_from_json(JSON_PATH, Class):
-    info_list = []
-    data = read_json_file(JSON_PATH)
-    for hash in data:
-        new_objects = Class(hash)
-        info_list.append(new_objects)
-    return info_list
 
 
 def log_in(Class):

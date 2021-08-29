@@ -2,17 +2,9 @@ from users import User
 from jsonworker import get_films_from_profile, log_in, add_film_to_profile
 import requests
 from film import OnlineCinema, Film
-import os
 import time
+from settings import URL_API, API_KEY, JSON_PATH_PLANNING, JSON_PATH_RATING, JSON_PATH_REVIEWED
 
-
-DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH_PLANNING = f'{DIR}/data/data_planning.json'
-JSON_PATH_REVIEWED = f'{DIR}/data/data_reviewed.json'
-JSON_PATH_RATING = f'{DIR}/data/data_rating.json'
-JSON_PATH_USERS = f'{DIR}/data/data_users.json'
-URL_API = "https://kinopoiskapiunofficial.tech/api/v2.2/films/top"
-API_KEY = "e093635d-9fc6-47fb-8c4f-5b1d8b994f4b"
 
 if __name__ == '__main__':
     response = requests.get(
@@ -25,7 +17,7 @@ if __name__ == '__main__':
     pagesCount = int(response['pagesCount']) + 1
     films = Film.get_all_films_from_site(pagesCount,URL_API,API_KEY)
     online_cinema = OnlineCinema(films)
-
+    
 
     user = log_in(User)
     while user:
@@ -51,7 +43,7 @@ if __name__ == '__main__':
             online_cinema.films_print(films_for_user, print)
             time.sleep(4)
         elif user_choice == '3':
-            films_for_user = online_cinema.filter_with_user_genre(input('\nВведите интересующий жанр:\n>').lower(), films)
+            films_for_user = online_cinema.get_films_by_genre(input('\nВведите интересующий жанр:\n>').lower())
             print('\n')
             online_cinema.films_print(films_for_user, print)
             time.sleep(4)

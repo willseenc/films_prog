@@ -1,30 +1,11 @@
-import os
+from settings import JSON_PATH_USERS
 import random
 import string
-from exceptions import ShortPassword, LongPassword, check_int
-from jsonworker import append_new_data_to_file, all_users_from_json
-
-
-DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH_PLANNING = f'{DIR}/data/data_planning.json'
-JSON_PATH_REVIEWED = f'{DIR}/data/data_reviewed.json'
-JSON_PATH_RATING = f'{DIR}/data/data_rating.json'
-JSON_PATH_USERS = f'{DIR}/data/data_users.json'
-URL_API = "https://kinopoiskapiunofficial.tech/api/v2.2/films/top"
-API_KEY = "e093635d-9fc6-47fb-8c4f-5b1d8b994f4b"
+from exceptions import WrongInfo, check_length
+from jsonworker import append_new_data_to_file, read_json_file
 
 
 class User:
-    def check_length(function):
-            def wrapper(length):
-                check_int(length)
-                if int(length) < 9:
-                    raise ShortPassword('Пароль должен быть длиннее 8 символов!')
-                elif int(length) > 12:
-                    raise LongPassword('Длина пароля не должна превышать 12 символов!')
-                return function(length)
-            return wrapper
-
     @check_length
     def special_password(length):
         password = string.ascii_letters
@@ -34,25 +15,25 @@ class User:
 
     @staticmethod
     def registration(user_name, password):
-        user = User({'username' : user_name, 'password' : password})
+        user = User({f'{user_name}' : True, f'{password}' : True})
         User.append_to_json_file(user)
-        print('Регистрация прошла успешно')
 
     @staticmethod
-    def sign_in(user_name, password):
-        users = all_users_from_json(JSON_PATH_USERS, User)
-        for user in users:
-            if user_name == user.username and password == user.password:
-                print("Вы успешно вошли в аккаунт!")
-                return user
-            elif user_name != user.username:
+    def sign_in(user_name, password): 
+        for user_hash in read_json_file(JSON_PATH_USERS):
+            try:
+                auth_nickname = user_hash[user_name]
+                auth_password = user_hash[password]
+            except:
                 continue
-        print('Логин или пароль неверен')
-        return False
+            else:
+                if auth_nickname and auth_password:
+                    return User({user_name : True, password : True})
+        raise WrongInfo('Пароль или логин неверен!')
 
     def __init__(self, user_hash):
-        self.username = user_hash["username"]
-        self.password = user_hash['password']
+        self.username = list(user_hash.keys())[0]
+        self.password = list(user_hash.keys())[1]
         self.user_hash = user_hash
 
     def append_to_json_file(self):

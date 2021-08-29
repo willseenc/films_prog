@@ -12,7 +12,28 @@ def check_rating(rating):
     return rating
 
 
+def check_length(function):
+    def wrapper(length):
+        check_int(length)
+        if int(length) < 9:
+            raise ShortPassword('Пароль должен быть длиннее 8 символов!')
+        elif int(length) > 12:
+            raise LongPassword('Длина пароля не должна превышать 12 символов!')
+        return function(length)
+    return wrapper
+
+
 class WrongRating(Exception):
+    def __init__(self,text):
+        self.txt = text
+
+
+class GenreNotExist(Exception):
+    def __init__(self,text):
+        self.txt = text
+
+
+class NextFilmNotExist(Exception):
     def __init__(self,text):
         self.txt = text
 
