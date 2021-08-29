@@ -140,7 +140,15 @@ class OnlineCinema():
         if user_choice == '1':
             for film in films_for_user:
                 user_films.append(f'{film}\nВаша оценка: {film_hash[user_film]}')
-    
+
+    def filter_with_user_genre(self, genre, films):
+        films_for_user = []
+        for film in films:
+            for genres in film.genres:
+                if genres['genre'] == genre:
+                    films_for_user.append(film)
+        return films_for_user
+
     def rating_key(self, film_hashes):
         for i in film_hashes.values():
             return int(i)   
