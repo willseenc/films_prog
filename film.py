@@ -125,9 +125,9 @@ class OnlineCinema():
         if user_choice == '1':
             genre = input('Жанр:\n>').lower()
             films_for_user = []
-        self.get_movie_object(films_for_user, films,user_choice,genre,user_films)
+        self.get_movie_objects(films,user_films, genre, user_choice, films_for_user)
         
-    def get_movie_object(self, films_for_user, films, user_choice, genre, user_films):
+    def get_movie_objects(self, films, user_films, genre, user_choice, films_for_user):
         for film_hash in films:
             for user_film in film_hash:
                 for film in self.films:
@@ -139,7 +139,9 @@ class OnlineCinema():
                             user_films.append(f'{film}\nВаша оценка: {film_hash[user_film]}')
         if user_choice == '1':
             for film in films_for_user:
-                user_films.append(f'{film}\nВаша оценка: {film_hash[user_film]}')
+                for film_hash in films:
+                    if film.__str__() in list(film_hash.keys()):
+                        user_films.append(f'{film}\nВаша оценка: {film_hash[film.__str__()]}')
 
     def filter_with_user_genre(self, genre, films):
         films_for_user = []
